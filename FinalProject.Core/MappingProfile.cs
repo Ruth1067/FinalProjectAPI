@@ -18,6 +18,8 @@ namespace FinalProject.Core
            // CreateMap<Nurse, NurseDTO>().ReverseMap();
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<Folder, FolderDTO>().ReverseMap();
+            //CreateMap<PurchasedCourses,PurchasedCoursesDTO>().ReverseMap();
+
         }
     }
 }

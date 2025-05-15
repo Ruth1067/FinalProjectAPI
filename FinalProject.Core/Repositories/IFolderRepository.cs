@@ -14,5 +14,6 @@ namespace FinalProject.Core.Repositories
         void AddFolder(Folder folder);
         void UpdateFolder(Folder folder);
         void DeleteFolder(int id);
+        //IEnumerable<Folder> GetCoursesByTeacherId(int teacherId);
     }
 }

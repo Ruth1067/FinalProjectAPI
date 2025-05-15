@@ -29,6 +29,15 @@ namespace FinalProject.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FolderId"));
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("TeacherId")
                         .HasColumnType("int");
 
@@ -62,19 +71,54 @@ namespace FinalProject.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
+                    b.PrimitiveCollection<string>("Roles")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FolderUser", b =>
+                {
+                    b.Property<int>("FoldersFolderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FoldersFolderId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("FolderUser");
+                });
+
+            modelBuilder.Entity("FolderUser", b =>
+                {
+                    b.HasOne("FinalProject.Core.Entities.Folder", null)
+                        .WithMany()
+                        .HasForeignKey("FoldersFolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Core.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static FinalProject.Data.Repositories.FolderRepository;
 
 namespace FinalProject.Data.Repositories
 {
-    public class FolderRepository:IFolderRepository
+    public class FolderRepository : IFolderRepository
     {
         private readonly DataContext _context;
 
@@ -41,4 +42,6 @@ namespace FinalProject.Data.Repositories
             if (folder != null) _context.Folders.Remove(folder);
         }
     }
+
 }
+

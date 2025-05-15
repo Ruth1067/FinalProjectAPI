@@ -14,5 +14,6 @@ namespace FinalProject.Core.Services
         Folder PostFolder(Folder value);
         Folder PutFolder(string d, Folder value);
         Folder DeleteFolder(int id);
+        //IEnumerable<Folder> GetCoursesByTeacherId(int teacherId);
     }
 }

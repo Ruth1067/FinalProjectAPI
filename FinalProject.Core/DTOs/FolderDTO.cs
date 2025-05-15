@@ -8,7 +8,7 @@ namespace FinalProject.Core.DTOs
 {
     public class FolderDTO
     {
-
+        public int? FolderId { get; set; }
         public int? TeacherId { get; set; }
         public string Title { get; set; }
         public string? TeacherName { get; set; }
