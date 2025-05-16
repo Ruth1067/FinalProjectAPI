@@ -16,6 +16,8 @@ using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using Amazon;
 using dotenv.net;
+using Amazon.TranscribeService;
+using Google.Api;
 public class Program
 {
     public static void Main(string[] args)
@@ -32,7 +34,7 @@ public class Program
 
         builder.Services.AddDefaultAWSOptions(awsOptions);
         builder.Services.AddAWSService<IAmazonS3>();
-
+        builder.Services.AddAWSService<IAmazonTranscribeService>();
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
