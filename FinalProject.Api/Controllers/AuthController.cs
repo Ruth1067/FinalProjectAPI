@@ -98,10 +98,10 @@ public class AuthController : ControllerBase
     // פונקציה לשליחת דוא"ל
     private async Task SendEmail(string toEmail, string randomPassword, string username)
     {
-        var fromAddress = new MailAddress("r0548571067@gmail.com", "Ruth Greiniman");
+        var fromAddress = new MailAddress("LearnAhead10@gmail.com", "LearnAhead");
         var toAddress = new MailAddress(toEmail);
-        const string fromPassword = "pftd vcjo cmrb bwtz"; // סיסמת הדוא"ל שלך
-        const string subject = "Welcome to Our Service";
+        const string fromPassword = "zeds yqng wrqv boly"; // סיסמת הדוא"ל שלך
+        const string subject = "Welcome to Our LearnAhead Service";
 
         string body = @"
     <html>
@@ -116,7 +116,7 @@ public class AuthController : ControllerBase
     <body>
         <div class='header'>
             <h1>Hello " + username + @"!</h1>
-            <h1>Welcome to Our Service</h1>
+            <h1>Welcome to Our LearnAhead Service</h1>
         </div>
         <div class='content'>
             <p>Your account has been created.</p>

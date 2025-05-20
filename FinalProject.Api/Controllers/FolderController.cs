@@ -47,6 +47,8 @@ public class FolderController : ControllerBase
         {
             CategoryId = value.CategoryId,
             CourseId = value.CourseId,
+            TeacherId=value.TeacherId,
+            TeacherName = value.TeacherName,
             Title = value.Title,
             description = value.description,
             numberOfLessons = value.numberOfLessons

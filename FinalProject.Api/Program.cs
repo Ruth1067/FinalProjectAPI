@@ -18,11 +18,12 @@ using Amazon;
 using dotenv.net;
 using Amazon.TranscribeService;
 using Google.Api;
+using DotNetEnv;
 public class Program
 {
     public static void Main(string[] args)
     {
-        DotEnv.Load();
+        Env.Load();
         var builder = WebApplication.CreateBuilder(args);
         var awsOptions = new AWSOptions
         {
