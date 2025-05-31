@@ -19,6 +19,7 @@ using dotenv.net;
 using Amazon.TranscribeService;
 using Google.Api;
 using DotNetEnv;
+using System.Text.Json;
 public class Program
 {
     public static void Main(string[] args)
@@ -52,9 +53,14 @@ public class Program
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-            options.AddPolicy("TeacherOrAdmin", policy => policy.RequireRole("Teacher", "Admin"));
+            options.AddPolicy("TeacherOnly", policy => policy.RequireRole("Teacher"));
             options.AddPolicy("StudentOnly", policy => policy.RequireRole("Student"));
         });
+        builder.Services.AddControllers()
+       .AddJsonOptions(x =>
+       {
+            x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+       });
 
         builder.Services.AddSwaggerGen(options =>
         {
@@ -117,8 +123,20 @@ public class Program
             };
         });
 
-        var app = builder.Build();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowNextJS", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
 
+
+        var app = builder.Build();
+        app.UseCors("AllowNextJS");
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

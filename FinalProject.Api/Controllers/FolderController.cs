@@ -7,11 +7,10 @@ using FinalProject.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-
-[Route("api/[controller]")]
 [ApiController]
-//[Authorize]
+[Route("api/[controller]")]
 public class FolderController : ControllerBase
 {
     private readonly IFolderService _folderService;
@@ -25,7 +24,6 @@ public class FolderController : ControllerBase
         _dataContext = dataContext;
     }
 
-    // GET: api/<TurnController>
     [HttpGet]
     //[Authorize]
     public ActionResult<IEnumerable<Folder>> Get()
@@ -35,6 +33,7 @@ public class FolderController : ControllerBase
         return Ok(folderDTO);
     }
 
+    //[Authorize(Policy = "TeacherOrAdmin")]
     [HttpPost("add-folder")]
     public async Task<IActionResult> Post([FromBody] FolderModel value)
     {
@@ -47,7 +46,7 @@ public class FolderController : ControllerBase
         {
             CategoryId = value.CategoryId,
             CourseId = value.CourseId,
-            TeacherId=value.TeacherId,
+            TeacherId = value.TeacherId,
             TeacherName = value.TeacherName,
             Title = value.Title,
             description = value.description,
@@ -60,6 +59,7 @@ public class FolderController : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = folder.FolderId }, folder);
     }
 
+    //[Authorize(Policy = "TeacherOrAdmin")]
     [HttpPost("add-lesson")]
     public async Task<IActionResult> Post([FromBody] LessonModel value)
     {
@@ -84,57 +84,51 @@ public class FolderController : ControllerBase
 
         return CreatedAtAction(nameof(Get), new { id = lesson.FolderId }, lesson);
     }
-    //public async Task<IActionResult> AddFolder([FromBody] FolderModel folder)
-    //{
-    //    //public ActionResult<Folder> AddFolder([FromBody] FolderModel folder)
-    //    {
-    //        if (folder == null)
-    //        {
-    //            return BadRequest("Folder data is required.");
-    //        }
 
-    //        // Map FolderModel to Folder before passing it to the service
-    //        var folderEntity = _mapper.Map<Folder>(folder);
+    [Authorize(Policy = "AdminOnly")]
+    [HttpPost("add-category")]
+    public async Task<IActionResult> AddCategory([FromBody] FolderModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.Title))
+        {
+            return BadRequest("Category name is required.");
+        }
 
-    //        var createdFolder = _folderService.PostFolder(folderEntity);
-    //        return Ok(CreatedAtAction(nameof(Get), new { id = createdFolder.CourseId }, createdFolder));
-    //    }
+        var exists = await _dataContext.Folders
+            .AnyAsync(c => c.Title == model.Title);
 
-    //}
+        if (exists)
+        {
+            return Conflict("A category with this name already exists.");
+        }
+
+        var category = new Folder { Title = model.Title };
+        _dataContext.Folders.Add(category);
+        await _dataContext.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Category added successfully",
+            categoryId = category.CategoryId,
+            categoryName = category.Title
+        });
+    }
+
+
+    [HttpGet("{id}")]
+    //[Authorize]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var folder = await _dataContext.Folders
+            .FirstOrDefaultAsync(f => f.FolderId == id);
+
+        if (folder == null)
+        {
+            return NotFound();
+        }
+
+        var folderDTO = _mapper.Map<FolderDTO>(folder);
+        return Ok(folderDTO);
+    }
+
 }
-
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
-
-//[ApiController]
-//[Route("api/[controller]")]
-//public class FilesController : ControllerBase
-//{
-//    [HttpGet("admin-only")]
-//    [Authorize(Policy = "AdminOnly")] // רק Admin יכול לגשת
-//    public IActionResult AdminOnly()
-//    {
-//        return Ok("This is accessible only by Admins.");
-//    }
-
-//    [HttpGet("editor-or-admin")]
-//    [Authorize(Policy = "EditorOrAdmin")] // Editor או Admin יכולים לגשת
-//    public IActionResult EditorOrAdmin()
-//    {
-//        return Ok("This is accessible by Editors and Admins.");
-//    }
-
-//    [HttpGet("viewer-only")]
-//    [Authorize(Policy = "ViewerOnly")] // רק Viewer יכול לגשת
-//    public IActionResult ViewerOnly()
-//    {
-//        return Ok("This is accessible only by Viewers.");
-//    }
-
-//    [HttpGet("authenticated-only")]
-//    [Authorize] // כל משתמש מאומת יכול לגשת
-//    public IActionResult AuthenticatedOnly()
-//    {
-//        return Ok("This is accessible by any authenticated user.");
-//    }
-//}
