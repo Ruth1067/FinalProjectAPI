@@ -50,7 +50,8 @@ public class FolderController : ControllerBase
             TeacherName = value.TeacherName,
             Title = value.Title,
             description = value.description,
-            numberOfLessons = value.numberOfLessons
+            numberOfLessons = value.numberOfLessons,
+            price = value.price
         };
 
         _dataContext.Folders.Add(folder);

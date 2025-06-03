@@ -17,7 +17,7 @@ namespace FinalProject.Core.Services
         User DeleteUser(int id);
         IEnumerable<Folder> GetFoldersByTeacherId(int teacherId);
         IEnumerable<User> GetUsersFoldersByFolderId(int folderId);
-
+        IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId);
     }
 
     //public interface IUserService

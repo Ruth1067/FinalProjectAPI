@@ -51,6 +51,89 @@
 //    }
 //}
 
+//using AutoMapper;
+//using FinalProject.Core.DTOs;
+//using FinalProject.Core.Entities;
+//using FinalProject.Core.Repositories;
+//using FinalProject.Core.Services;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using System.Collections.Generic;
+
+////using LinqToDB;
+
+
+//namespace FinalProject
+//{
+//    public class UserService : IUserService
+//    {
+//        private readonly IUserRepository _userRepository;
+//        private readonly DataContext _context;
+
+
+//        //public UserService(IUserRepository userRepository)
+//        //{
+//        //    _userRepository = userRepository;
+//        //}
+//        public UserService(IUserRepository userRepository, DataContext context)
+//        {
+//            _userRepository = userRepository;
+//            _context = context;
+//        }
+
+
+//        public List<User> GetAll()
+//        {
+//            return _userRepository.GetAll().ToList(); // שינוי מ-GetList ל-GetAll
+//        }
+
+//        public User GetById(int id)
+//        {
+//            return _userRepository.GetById(id);
+//        }
+
+//        public User PostUser(User value)
+//        {
+//            _userRepository.Add(value);
+//            return value; // מחזיר את המשתמש שנוסף
+//        }
+
+//        public User PutUser(string d, User value)
+//        {
+//            _userRepository.Update(value);
+//            return value; // מחזיר את המשתמש המעודכן
+//        }
+
+//        public User DeleteUser(int id)
+//        {
+//            var user = _userRepository.GetById(id);
+//            if (user != null)
+//            {
+//                _userRepository.Delete(id);
+//                return user; // מחזיר את המשתמש שנמחק
+//            }
+//            return null; // מחזיר null אם המשתמש לא נמצא
+//        }
+//        public IEnumerable<Folder> GetFoldersByTeacherId(int teacherId)
+//        {
+//            return _userRepository.GetFolderByTeacherId(teacherId); // הנחה שיש לנו Repository עבור קורסים
+//        }
+//        public IEnumerable<User> GetUsersFoldersByFolderId(int folderId)
+//        {
+//            return _userRepository.GetUsersFolderByFolderId(folderId); // הנחה שיש לנו Repository עבור קורסים
+//        }
+//        public IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId)
+//        {
+//            return _context.Folders
+//                .Include(f => f.Users)
+//                .Where(f => f.CourseId != null && f.Users.Any(u => u.UserId == userId))
+//                .ToList();
+//        }
+
+//    }
 using AutoMapper;
 using FinalProject.Core.DTOs;
 using FinalProject.Core.Entities;
@@ -61,7 +144,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 
 namespace FinalProject
 {
@@ -76,7 +158,7 @@ namespace FinalProject
 
         public List<User> GetAll()
         {
-            return _userRepository.GetAll().ToList(); // שינוי מ-GetList ל-GetAll
+            return _userRepository.GetAll().ToList();
         }
 
         public User GetById(int id)
@@ -87,13 +169,13 @@ namespace FinalProject
         public User PostUser(User value)
         {
             _userRepository.Add(value);
-            return value; // מחזיר את המשתמש שנוסף
+            return value;
         }
 
         public User PutUser(string d, User value)
         {
             _userRepository.Update(value);
-            return value; // מחזיר את המשתמש המעודכן
+            return value;
         }
 
         public User DeleteUser(int id)
@@ -102,19 +184,28 @@ namespace FinalProject
             if (user != null)
             {
                 _userRepository.Delete(id);
-                return user; // מחזיר את המשתמש שנמחק
+                return user;
             }
-            return null; // מחזיר null אם המשתמש לא נמצא
+            return null;
         }
+
         public IEnumerable<Folder> GetFoldersByTeacherId(int teacherId)
         {
-            return _userRepository.GetFolderByTeacherId(teacherId); // הנחה שיש לנו Repository עבור קורסים
+            return _userRepository.GetFolderByTeacherId(teacherId);
         }
+
         public IEnumerable<User> GetUsersFoldersByFolderId(int folderId)
         {
-            return _userRepository.GetUsersFolderByFolderId(folderId); // הנחה שיש לנו Repository עבור קורסים
+            return _userRepository.GetUsersFolderByFolderId(folderId);
+        }
+
+        public IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId)
+        {
+            // השאר את הלוגיקה הזו בתוך IUserRepository
+            return _userRepository.GetPurchasedCoursesByUserId(userId);
         }
     }
+}
 
     //public class UserService : IUserService
     //{
@@ -193,4 +284,4 @@ namespace FinalProject
     //        return new User();
     //    }
     //}
-}
+//}

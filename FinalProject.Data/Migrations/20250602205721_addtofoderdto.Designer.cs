@@ -3,6 +3,7 @@ using FinalProject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinalProject.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250602205721_addtofoderdto")]
+    partial class addtofoderdto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +38,6 @@ namespace FinalProject.Data.Migrations
                     b.Property<int?>("CourseId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsPurchased")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
@@ -55,9 +55,6 @@ namespace FinalProject.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("numberOfLessons")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("price")
                         .HasColumnType("int");
 
                     b.HasKey("FolderId");

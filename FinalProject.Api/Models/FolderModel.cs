@@ -2,6 +2,7 @@
 {
     public class FolderModel
     {
+        public bool? IsPurchased { get; set; }
         //public int? FolderId { get; set; }
         //public int? TeacherId { get; set; }
         public int? CategoryId { get; set; }
@@ -13,5 +14,6 @@
         public string? description { get; set; }
         public int? numberOfLessons { get; set; }
         //public List<string>? Lessons { get; set; }
+        public int? price { get; set; }
     }
 }

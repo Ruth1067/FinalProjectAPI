@@ -60,22 +60,52 @@ namespace FinalProject.Controllers
         //    }
         //    return Ok(courseDTOs);
         //}
+        //[HttpGet("{id}/folders")]
+        ////[Authorize]
+        //public ActionResult GetCoursesByUserId(int id)
+        //{
+        //    var courses = _userService.GetFoldersByTeacherId(id);
+        //    var courseDTOs = _mapper.Map<IEnumerable<FolderDTO>>(courses);
+
+        //    if (courseDTOs == null || !courseDTOs.Any())
+        //    {
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            message = "לא נמצאו תיקיות למשתמש זה.",
+        //            data = new List<FolderDTO>()
+        //        });
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        success = true,
+        //        message = "תיקיות נטענו בהצלחה.",
+        //        data = courseDTOs
+        //    });
+        //}
         [HttpGet("{id}/folders")]
         //[Authorize]
         public ActionResult GetCoursesByUserId(int id)
         {
-            var courses = _userService.GetFoldersByTeacherId(id);
-            var courseDTOs = _mapper.Map<IEnumerable<FolderDTO>>(courses);
+            var user = _userService.GetById(id);
+            if (user == null)
+                return NotFound("משתמש לא נמצא.");
 
-            if (courseDTOs == null || !courseDTOs.Any())
+            IEnumerable<Folder> courses;
+
+            if (user.Role == "Teacher")
             {
-                return Ok(new
-                {
-                    success = true,
-                    message = "לא נמצאו תיקיות למשתמש זה.",
-                    data = new List<FolderDTO>()
-                });
+                // מורה – קורסים שהוא יצר
+                courses = _userService.GetFoldersByTeacherId(id);
             }
+            else
+            {
+                // תלמיד – קורסים שהוא רכש
+                courses = _userService.GetPurchasedCoursesByUserId(id);
+            }
+
+            var courseDTOs = _mapper.Map<IEnumerable<FolderDTO>>(courses);
 
             return Ok(new
             {
@@ -84,6 +114,8 @@ namespace FinalProject.Controllers
                 data = courseDTOs
             });
         }
+
+
 
 
         [HttpGet("{id}/usersFolders")]

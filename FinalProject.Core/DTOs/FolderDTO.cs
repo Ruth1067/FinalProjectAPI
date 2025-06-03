@@ -8,6 +8,9 @@ namespace FinalProject.Core.DTOs
 {
     public class FolderDTO
     {
+        public bool? IsPurchased { get; set; }
+        public int? CategoryId { get; set; }
+        public int? CourseId { get; set; }
         public int? FolderId { get; set; }
         public int? TeacherId { get; set; }
         public string Title { get; set; }
@@ -15,5 +18,6 @@ namespace FinalProject.Core.DTOs
         public string? description { get; set; }
         public int? numberOfLessons { get; set; }
         //public List<string>? Lessons { get; set; }
+        public int? price { get; set; }
     }
 }
