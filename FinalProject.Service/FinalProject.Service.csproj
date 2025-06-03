@@ -50,5 +50,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\FinalProject.Core\FinalProject.Core.csproj" />
+		<ProjectReference Include="..\FinalProject.Data\FinalProject.Data.csproj" />
 	</ItemGroup>
 </Project>

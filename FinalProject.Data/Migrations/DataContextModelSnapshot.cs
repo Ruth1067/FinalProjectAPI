@@ -35,6 +35,9 @@ namespace FinalProject.Data.Migrations
                     b.Property<int?>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("IsPurchased")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("LessonId")
                         .HasColumnType("int");
 
@@ -106,7 +109,7 @@ namespace FinalProject.Data.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("FolderUser");
+                    b.ToTable("FolderUsers", (string)null);
                 });
 
             modelBuilder.Entity("FolderUser", b =>

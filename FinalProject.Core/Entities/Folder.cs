@@ -9,7 +9,7 @@ namespace FinalProject.Core.Entities
     public class Folder
     {
         public int? FolderId { get; set; }
-        //public bool IsPurchased {  get; set; }
+        public bool? IsPurchased { get; set; }
         public int? CategoryId { get; set; }
         public int? CourseId { get; set; }
         public int? TeacherId { get; set; }

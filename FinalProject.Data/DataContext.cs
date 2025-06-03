@@ -66,6 +66,7 @@
 
 using FinalProject.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace FinalProject
 {
@@ -74,12 +75,22 @@ namespace FinalProject
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=DBProject");
-        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Folder> Folders { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Folders)
+                .WithMany(f => f.Users)
+                .UsingEntity(j => j.ToTable("FolderUsers"));
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=SecondDB");
+        }
     }
 }
 

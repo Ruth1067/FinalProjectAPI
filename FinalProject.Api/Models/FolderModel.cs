@@ -8,6 +8,7 @@
         public int? CourseId { get; set; }
         public int? TeacherId { get; set; }
         public string? TeacherName { get; set; }
+        public bool? IsPurchased { get; set; }
         public string Title { get; set; }
         //public string? TeacherName { get; set; }
         public string? description { get; set; }

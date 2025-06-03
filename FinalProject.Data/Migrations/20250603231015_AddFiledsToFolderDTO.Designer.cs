@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinalProject.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250501210625_M17")]
-    partial class M17
+    [Migration("20250603231015_AddFiledsToFolderDTO")]
+    partial class AddFiledsToFolderDTO
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,18 @@ namespace FinalProject.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FolderId"));
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsPurchased")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("TeacherId")
                         .HasColumnType("int");
@@ -64,13 +76,20 @@ namespace FinalProject.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsTeacher")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.PrimitiveCollection<string>("Roles")
+                    b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
@@ -79,6 +98,36 @@ namespace FinalProject.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FolderUser", b =>
+                {
+                    b.Property<int>("FoldersFolderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FoldersFolderId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("FolderUsers", (string)null);
+                });
+
+            modelBuilder.Entity("FolderUser", b =>
+                {
+                    b.HasOne("FinalProject.Core.Entities.Folder", null)
+                        .WithMany()
+                        .HasForeignKey("FoldersFolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinalProject.Core.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

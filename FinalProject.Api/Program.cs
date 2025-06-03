@@ -123,16 +123,16 @@ public class Program
             };
         });
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowNextJS", policy =>
-            {
-                policy.WithOrigins("http://localhost:3000")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials();
-            });
-        });
+        //builder.Services.AddCors(options =>
+        //{
+        //    options.AddPolicy("AllowNextJS", policy =>
+        //    {
+        //        policy.WithOrigins("http://localhost:3000")
+        //              .AllowAnyHeader()
+        //              .AllowAnyMethod()
+        //              .AllowCredentials();
+        //    });
+        //});
 
 
         var app = builder.Build();
