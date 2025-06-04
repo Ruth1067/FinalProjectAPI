@@ -78,14 +78,51 @@ namespace FinalProject
 
         public DbSet<User> Users { get; set; }
         public DbSet<Folder> Folders { get; set; }
+        public DbSet<FolderUser> FolderUsers { get; set; }
 
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<User>()
+        //        .HasMany(u => u.Folders)
+        //        .WithMany(f => f.Users)
+        //        .UsingEntity(j => j.ToTable("FolderUsers"));
+        //    base.OnModelCreating(modelBuilder);
+
+        //    modelBuilder.Entity<FolderUser>()
+        //        .HasKey(fu => new { fu.UserId, fu.FolderId });
+
+        //    modelBuilder.Entity<FolderUser>()
+        //        .HasOne(fu => fu.User)
+        //        .WithMany(u => u.FolderUsers)
+        //        .HasForeignKey(fu => fu.UserId);
+
+        //    modelBuilder.Entity<FolderUser>()
+        //        .HasOne(fu => fu.Folder)
+        //        .WithMany(f => f.FolderUsers)
+        //        .HasForeignKey(fu => fu.FolderId);
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Folders)
-                .WithMany(f => f.Users)
-                .UsingEntity(j => j.ToTable("FolderUsers"));
+            // הגדרת מפתח משולב לטבלת הקשר
+            modelBuilder.Entity<FolderUser>()
+                .HasKey(fu => new { fu.UserId, fu.FolderId });
+
+            // קשר בין FolderUser ל-User
+            modelBuilder.Entity<FolderUser>()
+                .HasOne(fu => fu.User)
+                .WithMany(u => u.FolderUsers)
+                .HasForeignKey(fu => fu.UserId);
+
+            // קשר בין FolderUser ל-Folder
+            modelBuilder.Entity<FolderUser>()
+                .HasOne(fu => fu.Folder)
+                .WithMany(f => f.FolderUsers)
+                .HasForeignKey(fu => fu.FolderId);
+
+            base.OnModelCreating(modelBuilder);
         }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

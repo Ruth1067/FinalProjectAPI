@@ -16,11 +16,7 @@ namespace FinalProject.Core.Repositories
         void Delete(int id);
         IEnumerable<Folder> GetFolderByTeacherId(int teacherId);
         IEnumerable<User> GetUsersFolderByFolderId(int folderId);
-
-
-
-
-
+        IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId);
     }
 
     //public interface IUserRepository

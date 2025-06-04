@@ -18,6 +18,9 @@ namespace FinalProject.Core.Entities
         public string? TeacherName { get; set; }
         public string? description { get; set; }
         public int? numberOfLessons { get; set; }
+        public int? price { get; set; }
         public List<User>? Users { get; set; }
+        public ICollection<FolderUser> FolderUsers { get; set; }
+
     }
 }

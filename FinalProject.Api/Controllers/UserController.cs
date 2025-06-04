@@ -162,6 +162,44 @@ namespace FinalProject.Controllers
             return Ok(userDTO);
         }
 
+        //[HttpGet("{id}/folders")]
+        //[Authorize]
+        //public ActionResult<IEnumerable<FolderDTO>> GetCoursesByUserId(int id)
+        //{
+        //    var courses = _userService.GetFoldersByTeacherId(id); // הנחה שיש מתודה כזו בשירות המשתמשים
+        //    var courseDTOs = _mapper.Map<IEnumerable<FolderDTO>>(courses);
+
+        //    if (courseDTOs == null || !courseDTOs.Any())
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(courseDTOs);
+        //}
+        //[HttpGet("{id}/folders")]
+        ////[Authorize]
+        //public ActionResult GetCoursesByUserId(int id)
+        //{
+        //    var courses = _userService.GetFoldersByTeacherId(id);
+        //    var courseDTOs = _mapper.Map<IEnumerable<FolderDTO>>(courses);
+
+        //    if (courseDTOs == null || !courseDTOs.Any())
+        //    {
+        //        return Ok(new
+        //        {
+        //            success = true,
+        //            message = "לא נמצאו תיקיות למשתמש זה.",
+        //            data = new List<FolderDTO>()
+        //        });
+        //    }
+
+        //    return Ok(new
+        //    {
+        //        success = true,
+        //        message = "תיקיות נטענו בהצלחה.",
+        //        data = courseDTOs
+        //    });
+        //}
+
         [HttpGet("{id}/folders")]
         public ActionResult GetCoursesByUserId(int id)
         {
@@ -173,10 +211,13 @@ namespace FinalProject.Controllers
 
             if (user.Role == "Teacher")
             {
+
                 courses = _userService.GetFoldersByTeacherId(id);
             }
             else
             {
+
+
                 courses = _userService.GetPurchasedCoursesByUserId(id);
             }
 
@@ -203,5 +244,21 @@ namespace FinalProject.Controllers
 
             return Ok(userDTOs);
         }
+
+        [HttpPost("{userId}/purchase/{folderId}")]
+        public async Task<IActionResult> PurchaseCourse(int userId, int folderId)
+        {
+            var success = await _userService.PurchaseCourseAsync(userId, folderId);
+
+            if (!success)
+                return Conflict("הרכישה כבר קיימת.");
+
+            return Ok(new
+            {
+                success = true,
+                message = "הרכישה נשמרה בהצלחה"
+            });
+        }
+
     }
 }

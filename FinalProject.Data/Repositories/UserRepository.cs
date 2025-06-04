@@ -126,7 +126,15 @@ namespace FinalProject.Data.Repositories
         public IEnumerable<User> GetUsersFolderByFolderId(int folderId)
         {
             return _context.Users
-                .Where(user => user.Folders.Any(folder => folder.FolderId == folderId))
+                .Where(user => user.FolderUsers.Any(folderUser => folderUser.FolderId == folderId))
+                .ToList();
+        }
+
+        public IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId)
+        {
+            return _context.Folders
+                .Include(f => f.Users)
+                .Where(f => f.CourseId != null && f.Users.Any(u => u.Id == userId))
                 .ToList();
         }
     }

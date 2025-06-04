@@ -5,7 +5,7 @@
 namespace FinalProject.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFiledsToFolderDTO : Migration
+    public partial class addPrice : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -10,7 +10,7 @@
 //using System.Net.Mail;
 //using System.Threading.Tasks;
 //using Microsoft.AspNetCore.Authorization;
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //[ApiController]
 //[Route("api/[controller]")]
 //public class AuthController : ControllerBase
@@ -200,22 +200,39 @@ public class AuthController : ControllerBase
         _dataContext = dataContext;
     }
 
+    //[HttpPost("login")]
+    //public async Task<IActionResult> Login([FromBody] LoginModel model)
+    //{
+    //    var user = await _dataContext.Users
+    //        .FirstOrDefaultAsync(u => u.Password == model.Password);
+
+    //    if (user == null || model.Email != user.Email)
+    //    {
+    //        return Unauthorized();
+    //    }
+    //    await NotifyAdminActivity("משתמש נכנס למערכת", user.UserName, user.Email,user.PhoneNumber,user.Password);
+
+
+    //    var token = _authService.GenerateJwtToken(user.UserName, user.Role);
+    //    return Ok(new { Token = token });
+    //}
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         var user = await _dataContext.Users
-            .FirstOrDefaultAsync(u => u.Password == model.Password);
+            .FirstOrDefaultAsync(u => u.Email == model.Email && u.Password == model.Password);
 
-        if (user == null || model.Email != user.Email)
+        if (user == null)
         {
-            return Unauthorized();
+            return Unauthorized("Invalid email or password.");
         }
-        await NotifyAdminActivity("משתמש נכנס למערכת", user.UserName, user.Email,user.PhoneNumber,user.Password);
 
+        await NotifyAdminActivity("משתמש נכנס למערכת", user.UserName, user.Email, user.PhoneNumber, user.Password);
 
         var token = _authService.GenerateJwtToken(user.UserName, user.Role);
         return Ok(new { Token = token });
     }
+
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)

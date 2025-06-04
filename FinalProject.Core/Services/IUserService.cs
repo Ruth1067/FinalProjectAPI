@@ -18,7 +18,7 @@ namespace FinalProject.Core.Services
         IEnumerable<Folder> GetFoldersByTeacherId(int teacherId);
         IEnumerable<User> GetUsersFoldersByFolderId(int folderId);
         IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId);
-
+        Task<bool> PurchaseCourseAsync(int userId, int folderId);
     }
 
     //public interface IUserService

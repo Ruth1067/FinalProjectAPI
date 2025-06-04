@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FinalProject.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFolderUsersTable : Migration
+    public partial class fromBegining : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,7 +25,8 @@ namespace FinalProject.Data.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TeacherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    numberOfLessons = table.Column<int>(type: "int", nullable: true)
+                    numberOfLessons = table.Column<int>(type: "int", nullable: true),
+                    price = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -43,41 +45,53 @@ namespace FinalProject.Data.Migrations
                     IsTeacher = table.Column<bool>(type: "bit", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FolderId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Folders_FolderId",
+                        column: x => x.FolderId,
+                        principalTable: "Folders",
+                        principalColumn: "FolderId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "FolderUsers",
                 columns: table => new
                 {
-                    FoldersFolderId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    FolderId = table.Column<int>(type: "int", nullable: false),
+                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FolderUsers", x => new { x.FoldersFolderId, x.UsersId });
+                    table.PrimaryKey("PK_FolderUsers", x => new { x.UserId, x.FolderId });
                     table.ForeignKey(
-                        name: "FK_FolderUsers_Folders_FoldersFolderId",
-                        column: x => x.FoldersFolderId,
+                        name: "FK_FolderUsers_Folders_FolderId",
+                        column: x => x.FolderId,
                         principalTable: "Folders",
                         principalColumn: "FolderId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FolderUsers_Users_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_FolderUsers_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FolderUsers_UsersId",
+                name: "IX_FolderUsers_FolderId",
                 table: "FolderUsers",
-                column: "UsersId");
+                column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_FolderId",
+                table: "Users",
+                column: "FolderId");
         }
 
         /// <inheritdoc />
@@ -87,10 +101,10 @@ namespace FinalProject.Data.Migrations
                 name: "FolderUsers");
 
             migrationBuilder.DropTable(
-                name: "Folders");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Folders");
         }
     }
 }
