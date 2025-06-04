@@ -21,16 +21,5 @@ namespace FinalProject.Core.DTOs
         public int? numberOfLessons { get; set; }
         public int? price { get; set; }
         public List<User>? Users { get; set; }
-
-        //public List<string>? Lessons { get; set; }
     }
 }
-
-    //public int? FolderId { get; set; }
-    //public int? TeacherId { get; set; }
-    //public bool? IsPurchased { get; set; }
-    //public string Title { get; set; }
-    //public string? TeacherName { get; set; }
-    //public string? description { get; set; }
-    //public int? numberOfLessons { get; set; }
-    //public List<string>? Lessons { get; set; }

@@ -1,5 +1,4 @@
-﻿
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.TranscribeService;
 using Amazon.TranscribeService.Model;
@@ -31,7 +30,6 @@ public class UploadController : ControllerBase
         _transcribeService = new AmazonTranscribeServiceClient(credentials, region);
     }
 
-    //[Authorize(Policy = "TeacherOrAdmin")]
     [HttpPost("upload-file")]
     public async Task<IActionResult> UploadFile(IFormFile file)
     {
@@ -80,12 +78,11 @@ public class UploadController : ControllerBase
 
     [Authorize]
     [HttpGet("transcript")]
-    [ProducesResponseType(typeof(string), 200)] // Swagger יציג את זה כמחרוזת
+    [ProducesResponseType(typeof(string), 200)]
     public async Task<IActionResult> GetTranscriptContentAsync([FromQuery] string fileName)
     {
         try
         {
-            // בדיקה אם הקובץ קיים
             var metadataRequest = new GetObjectMetadataRequest
             {
                 BucketName = _bucketName,
@@ -101,7 +98,6 @@ public class UploadController : ControllerBase
                 return NotFound("Transcript file not found.");
             }
 
-            // הורדת הקובץ
             var getRequest = new GetObjectRequest
             {
                 BucketName = _bucketName,
@@ -112,7 +108,6 @@ public class UploadController : ControllerBase
             using var reader = new StreamReader(response.ResponseStream);
             var content = await reader.ReadToEndAsync();
 
-            // חילוץ טקסט מתוך transcripts
             try
             {
                 var jsonNode = JsonNode.Parse(content);
@@ -128,7 +123,7 @@ public class UploadController : ControllerBase
                 if (string.IsNullOrWhiteSpace(combinedText))
                     return NotFound("Transcript text is empty.");
 
-                return Ok(combinedText); // מחזיר רק את הטקסט במחרוזת אחת
+                return Ok(combinedText);
             }
             catch (JsonException)
             {

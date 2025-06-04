@@ -18,30 +18,4 @@ namespace FinalProject.Core.Repositories
         IEnumerable<User> GetUsersFolderByFolderId(int folderId);
         IEnumerable<Folder> GetPurchasedCoursesByUserId(int userId);
     }
-
-    //public interface IUserRepository
-    //{
-    //    //User GetById(int id);
-    //    //IEnumerable<User> GetAll();
-    //    //void Add(User user);
-    //    //void Update(User user);
-    //    //void Delete(int id);
-
-
-    //    //List<User> GetList();
-    //    //User GetUser(int id);
-    //    //User PostUser(User value);
-    //    //User PutUser(string d, User value);
-    //    //User DeleteUser(int id);
-    //    //void Update(User value);
-    //    //User GetById(int id);
-    //    //object GetAll();
-
-    //    User GetById(int id);
-    //    IEnumerable<User> GetAll();
-    //    void Add(User user);
-    //    void Update(User user);
-    //    void Delete(int id);
-    //}
-
 }

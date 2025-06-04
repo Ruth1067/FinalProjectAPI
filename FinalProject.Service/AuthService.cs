@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-//using Microsoft.AspNetCore.Mvc;
 public class AuthService
 {
     private readonly IConfiguration _configuration;
@@ -24,12 +23,6 @@ public class AuthService
               new Claim(ClaimTypes.Name, username),
               new Claim(ClaimTypes.Role, role)
           };
-
-        //Add roles as claims  
-        //foreach (var role in roles)
-        //{
-        //    claims.Add(new Claim(ClaimTypes.Role, role));
-        //}
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
