@@ -59,7 +59,7 @@ public class Program
         builder.Services.AddControllers()
        .AddJsonOptions(x =>
        {
-            x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+           x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
        });
 
         builder.Services.AddSwaggerGen(options =>
@@ -100,6 +100,11 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IFolderService, FolderService>();
         builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+        //var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+        //builder.Services.AddDbContext<DataContext>(options =>
+        //      options.UseSqlServer(connectionString));
+
         builder.Services.AddDbContext<DataContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddAutoMapper(typeof(MappingProfile));

@@ -117,28 +117,28 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost("{userId}/purchase/{folderId}")]
-        public async Task<IActionResult> PurchaseFolder(Guid userId, Guid folderId)
+        public async Task<IActionResult> PurchaseFolder(int userId, int folderId)
         {
-            var folder = await _context.Folders.FindAsync(folderId);
-            var user = await _context.Users.FindAsync(userId);
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+            var user = await _dataContext.Users.FindAsync(userId);
 
             if (folder == null || user == null)
                 return NotFound("Folder or user not found.");
 
-            var alreadyPurchased = await _context.FolderUsers
+            var alreadyPurchased = await _dataContext.FolderUsers
                 .AnyAsync(fu => fu.UserId == userId && fu.FolderId == folderId);
 
             if (alreadyPurchased)
                 return Conflict("Folder already purchased.");
 
-            _context.FolderUsers.Add(new FolderUser
+            _dataContext.FolderUsers.Add(new FolderUser
             {
                 UserId = userId,
                 FolderId = folderId,
                 PurchaseDate = DateTime.UtcNow
             });
 
-            await _context.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
             return Ok("Purchase successful.");
         }
 
