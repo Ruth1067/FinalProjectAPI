@@ -20,6 +20,8 @@ using Amazon.TranscribeService;
 using Google.Api;
 using DotNetEnv;
 using System.Text.Json;
+using MySqlConnector; // ודא שהוספת את החבילה
+
 public class Program
 {
     public static void Main(string[] args)
@@ -100,8 +102,17 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IFolderService, FolderService>();
         builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+
+
         builder.Services.AddDbContext<DataContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        {
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? Environment.GetEnvironmentVariable("DefaultConnection");
+
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
+        //builder.Services.AddDbContext<DataContext>(options =>
+            //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
         builder.Services.AddAuthentication(options =>
