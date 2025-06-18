@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using FinalProject.Core.Entities;
 //using Microsoft.AspNetCore.Mvc;
 public class AuthService
 {
@@ -14,7 +15,7 @@ public class AuthService
         _configuration = configuration;
     }
 
-    public string GenerateJwtToken(string username, string role)
+    public string GenerateJwtToken(string username, string role, int id)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -22,7 +23,8 @@ public class AuthService
         var claims = new List<Claim>
           {
               new Claim(ClaimTypes.Name, username),
-              new Claim(ClaimTypes.Role, role)
+              new Claim(ClaimTypes.Role, role),
+              new Claim(ClaimTypes.NameIdentifier,id.ToString())
           };
 
         //Add roles as claims  

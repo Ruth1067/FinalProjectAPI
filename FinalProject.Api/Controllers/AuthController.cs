@@ -229,7 +229,7 @@ public class AuthController : ControllerBase
 
         await NotifyAdminActivity("משתמש נכנס למערכת", user.UserName, user.Email, user.PhoneNumber, user.Password);
 
-        var token = _authService.GenerateJwtToken(user.UserName, user.Role);
+        var token = _authService.GenerateJwtToken(user.UserName, user.Role,(int)user.Id);
         return Ok(new { Token = token });
     }
 
@@ -265,7 +265,7 @@ public class AuthController : ControllerBase
         //await NotifyAdminNewUser(model.UserName, model.Email, model.PhoneNumber, randomPassword);
         await NotifyAdminActivity("משתמש חדש נרשם למערכת", model.UserName, model.Email,model.PhoneNumber,randomPassword);
 
-        var token = _authService.GenerateJwtToken(user.UserName, user.Role);
+        var token = _authService.GenerateJwtToken(user.UserName, user.Role, (int)user.Id);
         return Ok(new { Token = token });
     }
 

@@ -6,6 +6,10 @@ using FinalProject.Core.Services;
 using Google.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
+using System.Net;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinalProject.Controllers
 {
@@ -48,6 +52,28 @@ namespace FinalProject.Controllers
             return Ok(folderDTO);
         }
 
+        [HttpPost("add-category")]
+        public async Task<IActionResult> AddCategory([FromBody] FolderModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Title))
+                return BadRequest("Category name is required.");
+
+            var exists = await _dataContext.Folders.AnyAsync(c => c.Title == model.Title);
+            if (exists)
+                return Conflict("A category with this name already exists.");
+
+            var category = new Folder { Title = model.Title };
+            _dataContext.Folders.Add(category);
+            await _dataContext.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Category added successfully",
+                categoryId = category.CategoryId,
+                categoryName = category.Title
+            });
+        }
+
         [HttpPost("add-folder")]
         public async Task<IActionResult> Post([FromBody] FolderModel value)
         {
@@ -62,7 +88,8 @@ namespace FinalProject.Controllers
                 TeacherName = value.TeacherName,
                 Title = value.Title,
                 description = value.description,
-                numberOfLessons = value.numberOfLessons
+                numberOfLessons = value.numberOfLessons,
+                price = value.price
             };
 
             _dataContext.Folders.Add(folder);
@@ -94,53 +121,320 @@ namespace FinalProject.Controllers
             return CreatedAtAction(nameof(Get), new { id = lesson.FolderId }, lesson);
         }
 
-        [HttpPost("add-category")]
-        public async Task<IActionResult> AddCategory([FromBody] FolderModel model)
+
+
+        [Authorize]
+        [HttpPost("purchase/{folderId}")]
+        public async Task<IActionResult> PurchaseFolder(int folderId)
         {
-            if (string.IsNullOrWhiteSpace(model.Title))
-                return BadRequest("Category name is required.");
+            var folder = await _dataContext.Folders.FindAsync(folderId);
 
-            var exists = await _dataContext.Folders.AnyAsync(c => c.Title == model.Title);
-            if (exists)
-                return Conflict("A category with this name already exists.");
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var category = new Folder { Title = model.Title };
-            _dataContext.Folders.Add(category);
-            await _dataContext.SaveChangesAsync();
+            int Id;
 
-            return Ok(new
+            int.TryParse(user, out Id);
+            var student = await _dataContext.Users.FindAsync(Id);
+
+            if (student == null)
             {
-                message = "Category added successfully",
-                categoryId = category.CategoryId,
-                categoryName = category.Title
-            });
-        }
-
-        [HttpPost("{userId}/purchase/{folderId}")]
-        public async Task<IActionResult> PurchaseFolder(Guid userId, Guid folderId)
-        {
-            var folder = await _context.Folders.FindAsync(folderId);
-            var user = await _context.Users.FindAsync(userId);
+                return NotFound("Student not found.");
+            }
 
             if (folder == null || user == null)
                 return NotFound("Folder or user not found.");
 
-            var alreadyPurchased = await _context.FolderUsers
-                .AnyAsync(fu => fu.UserId == userId && fu.FolderId == folderId);
+            var alreadyPurchased = await _dataContext.FolderUsers
+                .AnyAsync(fu => fu.UserId == Id && fu.FolderId == folderId);
 
             if (alreadyPurchased)
                 return Conflict("Folder already purchased.");
 
-            _context.FolderUsers.Add(new FolderUser
+            _dataContext.FolderUsers.Add(new FolderUser
             {
-                UserId = userId,
+                UserId = Id,
                 FolderId = folderId,
                 PurchaseDate = DateTime.UtcNow
             });
 
-            await _context.SaveChangesAsync();
+            await _dataContext.SaveChangesAsync();
             return Ok("Purchase successful.");
         }
+
+        //[Authorize]
+        //[HttpGet("check-purchase/{courseId}")]
+        //public async Task<IActionResult> CheckPurchase(int courseId)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    int Id;
+        //    int.TryParse(userId, out Id);
+
+        //    // בדוק אם הקורס נרכש על ידי המשתמש
+        //    var alreadyPurchased = await _dataContext.FolderUsers
+        //        .AnyAsync(fu => fu.UserId == Id && fu.FolderId == courseId);
+        //    if(alreadyPurchased)
+        //       return Ok(true);
+        //    return Ok(false);
+        //}
+
+        //[Authorize]
+        //[HttpGet("check-purchase/{courseId}")]
+        //public async Task<bool> CheckPurchase(int folderId)
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    int Id;
+        //    int.TryParse(userId, out Id);
+
+        //    // בדוק אם הקורס נרכש על ידי המשתמש
+        //    var alreadyPurchased = await _dataContext.FolderUsers
+        //        .AnyAsync(fu => fu.UserId == Id && fu.FolderId == folderId);
+        //    return alreadyPurchased;
+        //}
+        [HttpGet("check-purchase/{folderId}")]
+        public async Task<bool> CheckPurchase(int folderId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int Id;
+            int.TryParse(userId, out Id);
+
+            // בדוק אם הקורס נרכש על ידי המשתמש
+            var alreadyPurchased = await _dataContext.FolderUsers
+                .AnyAsync(fu => fu.UserId == Id && fu.FolderId == folderId);
+            return alreadyPurchased;
+        }
+
+        //[HttpPost("{userId}/purchase/{folderId}")]
+        //public async Task<IActionResult> PurchaseFolder(int userId, int folderId)
+        //{
+        //    var folder = await _dataContext.Folders.FindAsync(folderId);
+        //    //var user = await _dataContext.Users.FindAsync(userId);
+        //    var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    if (folder == null || user == null)
+        //        return NotFound("Folder or user not found.");
+
+        //    var alreadyPurchased = await _dataContext.FolderUsers
+        //        .AnyAsync(fu => fu.UserId == userId && fu.FolderId == folderId);
+
+        //    if (alreadyPurchased)
+        //        return Conflict("Folder already purchased.");
+
+        //    _dataContext.FolderUsers.Add(new FolderUser
+        //    {
+        //        UserId = userId,
+        //        FolderId = folderId,
+        //        PurchaseDate = DateTime.UtcNow
+        //    });
+
+        //    await _dataContext.SaveChangesAsync();
+        //    return Ok("Purchase successful.");
+        //}
+
+        [HttpGet("{folderId}/students")]
+        public async Task<IActionResult> GetStudentsByFolder(int folderId)
+        {
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+            if (folder == null)
+                return NotFound("Folder not found.");
+
+            var studentUsers = await _dataContext.FolderUsers
+                .Where(fu => fu.FolderId == folderId)
+                .Include(fu => fu.User) // הנחה שיש לנו קשר ניווט ל-User
+                .Select(fu => new
+                {
+                    fu.User.Id,
+                    fu.User.UserName,
+                    fu.User.Email
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                success = true,
+                data = studentUsers,
+                message = "התלמידים נטענו בהצלחה"
+            });
+        }
+
+        //[HttpPost("send-teacher-email")]
+        //public async Task<IActionResult> SendEmailToTeacher(string fromEmail, string toEmail, string subject, string bodyHtml)
+        //{
+        //    try
+        //    {
+        //        var fromAddress = new MailAddress("LearnAhead10@gmail.com", "LearnAhead");
+        //        var toAddress = new MailAddress(toEmail);
+        //        var replyToAddress = new MailAddress(fromEmail);
+
+        //        const string fromPassword = "zeds yqng wrqv boly"; // סיסמת המייל של האתר
+
+        //        using var smtp = new SmtpClient
+        //        {
+        //            Host = "smtp.gmail.com",
+        //            Port = 587,
+        //            EnableSsl = true,
+        //            DeliveryMethod = SmtpDeliveryMethod.Network,
+        //            UseDefaultCredentials = false,
+        //            Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+        //        };
+
+        //        using var message = new MailMessage(fromAddress, toAddress)
+        //        {
+        //            Subject = subject,
+        //            Body = bodyHtml,
+        //            IsBodyHtml = true
+        //        };
+
+        //        message.ReplyToList.Add(replyToAddress);
+
+        //        await smtp.SendMailAsync(message);
+
+        //        return Ok("Email sent successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // כאן ניתן לרשום לוג שגיאה או טיפול שגיאה נוסף
+        //        return StatusCode(500, "Failed to send email: " + ex.Message);
+        //    }
+        //}
+        //[HttpPost("send-teacher-email")]
+        //public async Task<IActionResult> SendEmailToTeacher(int folderId, string bodyHtml)
+        //{
+        //    try
+        //    {
+        //        // שלוף את המידע ממסד הנתונים
+        //        var folder = await _dataContext.Folders.FindAsync(folderId);
+        //        if (folder == null)
+        //        {
+        //            return NotFound("Folder not found.");
+        //        }
+
+        //        var user = await _dataContext.Users.FindAsync(folder.TeacherId);
+        //        if (user == null)
+        //        {
+        //            return NotFound("Teacher not found.");
+        //        }
+
+        //        string fromEmail = "LearnAhead10@gmail.com"; // המייל הקבוע
+        //        string toEmail = user.Email; // כתובת המייל של המורה
+        //        string subject = folder.Title; // שם הקורס
+
+        //        var fromAddress = new MailAddress(fromEmail, "LearnAhead");
+        //        var replyToAddress = new MailAddress(fromEmail);
+
+        //        const string fromPassword = "zeds yqng wrqv boly"; // סיסמת המייל של האתר
+
+        //        using var smtp = new SmtpClient
+        //        {
+        //            Host = "smtp.gmail.com",
+        //            Port = 587,
+        //            EnableSsl = true,
+        //            DeliveryMethod = SmtpDeliveryMethod.Network,
+        //            UseDefaultCredentials = false,
+        //            Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+        //        };
+
+        //        using var message = new MailMessage(fromAddress, new MailAddress(toEmail))
+        //        {
+        //            Subject = subject,
+        //            Body = bodyHtml,
+        //            IsBodyHtml = true
+        //        };
+
+        //        message.ReplyToList.Add(replyToAddress);
+
+        //        await smtp.SendMailAsync(message);
+
+        //        return Ok("Email sent successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "Failed to send email: " + ex.Message);
+        //    }
+        //}
+        [Authorize]
+        [HttpPost("send-teacher-email")]
+        public async Task<IActionResult> SendEmailToTeacher(int folderId, string bodyHtml)
+        {
+            try
+            {
+                // שלוף את המידע ממסד הנתונים
+                var folder = await _dataContext.Folders.FindAsync(folderId);
+                if (folder == null)
+                {
+                    return NotFound("Folder not found.");
+                }
+
+                var user = await _dataContext.Users.FindAsync(folder.TeacherId);
+                if (user == null)
+                {
+                    return NotFound("Teacher not found.");
+                }
+
+                // הנח שיש לך גישה למידע על התלמיד, לדוגמה מהקשר הנוכחי
+                var studentId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                ////var studentIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //Console.WriteLine($"Student ID from JWT: {studentId}"); // הדפס את המזהה
+
+                //var studentIdString = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value?.Trim();
+
+                //if (string.IsNullOrEmpty(studentIdString))
+                //{
+                //    return BadRequest("Student ID is missing.");
+                //}// או כל דרך אחרת לשלוף את מזהה התלמיד
+                int Id;
+                //if (!int.TryParse(studentIdString, out Id))
+                //{
+                //    return BadRequest("Invalid student ID.");
+                //} 
+                int.TryParse(studentId, out Id);
+                var student = await _dataContext.Users.FindAsync(Id);
+
+                if (student == null)
+                {
+                    return NotFound("Student not found.");
+                }
+
+                string fromEmail = "LearnAhead10@gmail.com"; // המייל הקבוע
+                string toEmail = user.Email; // כתובת המייל של המורה
+                string subject = folder.Title; // שם הקורס
+
+                // הוסף את כתובת התלמיד לתוכן המייל
+                bodyHtml += $"<br/><br/>כתובת מייל של התלמיד: {student.Email}";
+
+                var fromAddress = new MailAddress(fromEmail, "LearnAhead");
+                var replyToAddress = new MailAddress(fromEmail);
+
+                const string fromPassword = "zeds yqng wrqv boly"; // סיסמת המייל של האתר
+
+                using var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                };
+
+                using var message = new MailMessage(fromAddress, new MailAddress(toEmail))
+                {
+                    Subject = subject,
+                    Body = bodyHtml,
+                    IsBodyHtml = true
+                };
+
+                message.ReplyToList.Add(replyToAddress);
+
+                await smtp.SendMailAsync(message);
+
+                return Ok("Email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Failed to send email: " + ex.Message);
+            }
+        }
+
 
     }
 }
