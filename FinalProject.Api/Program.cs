@@ -1,4 +1,4 @@
-////////////using FinalProject.Core.Services;
+ï»¿////////////using FinalProject.Core.Services;
 ////////////using FinalProject.Core;
 ////////////using FinalProject.Data.Repositories;
 ////////////using FinalProject.Service;
@@ -20,7 +20,7 @@
 ////////////using Google.Api;
 ////////////using DotNetEnv;
 ////////////using System.Text.Json;
-////////////using MySqlConnector; // åãà ùäåñôú àú äçáéìä
+////////////using MySqlConnector; // ×•×“× ×©×”×•×¡×¤×ª ××ª ×”×—×‘×™×œ×”
 
 ////////////public class Program
 ////////////{
@@ -45,7 +45,7 @@
 ////////////            options.JsonSerializerOptions.WriteIndented = true;
 ////////////        });
 
-////////////        // äâãøú îâáìú âåãì ÷åáõ
+////////////        // ×”×’×“×¨×ª ××’×‘×œ×ª ×’×•×“×œ ×§×•×‘×¥
 ////////////        builder.Services.Configure<FormOptions>(options =>
 ////////////        {
 ////////////            options.MultipartBodyLengthLimit = 104857600; // 100MB
@@ -214,7 +214,7 @@
 //////////            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 //////////        });
 
-//////////        // CORS – îúàéí ìÎRender
+//////////        // CORS â€“ ××ª××™× ×œÖ¾Render
 //////////        builder.Services.AddCors(options =>
 //////////        {
 //////////            options.AddPolicy("RenderPolicy", policy =>
@@ -314,7 +314,7 @@
 //////////        }
 
 //////////        app.UseHttpsRedirection();
-//////////        app.UseCors("RenderPolicy"); // CORS çééá ìäéåú ëàï
+//////////        app.UseCors("RenderPolicy"); // CORS ×—×™×™×‘ ×œ×”×™×•×ª ×›××Ÿ
 //////////        app.UseAuthentication();
 //////////        app.UseAuthorization();
 
@@ -374,7 +374,7 @@
 ////////            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 ////////        });
 
-////////        // CORS – îúàéí ìÎRender
+////////        // CORS â€“ ××ª××™× ×œÖ¾Render
 ////////        builder.Services.AddCors(options =>
 ////////        {
 ////////            options.AddPolicy("RenderPolicy", policy =>
@@ -382,7 +382,7 @@
 ////////                policy.WithOrigins("https://learnahead.onrender.com")
 ////////                      .AllowAnyHeader()
 ////////                      .AllowAnyMethod();
-////////                // àí áòúéã úöèøê Cookie/Authorization:
+////////                // ×× ×‘×¢×ª×™×“ ×ª×¦×˜×¨×š Cookie/Authorization:
 ////////                // policy.AllowCredentials();
 ////////            });
 ////////        });
@@ -477,7 +477,7 @@
 
 ////////        app.UseHttpsRedirection();
 
-////////        // çùåá: UseCors çééá ìáåà ìôğé UseAuthentication å-UseAuthorization
+////////        // ×—×©×•×‘: UseCors ×—×™×™×‘ ×œ×‘×•× ×œ×¤× ×™ UseAuthentication ×•-UseAuthorization
 ////////        app.UseCors("RenderPolicy");
 
 ////////        app.UseAuthentication();
@@ -540,7 +540,7 @@
 //////            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 //////        });
 
-//////        // CORS – îúàéí ìÎRender
+//////        // CORS â€“ ××ª××™× ×œÖ¾Render
 //////        builder.Services.AddCors(options =>
 //////        {
 //////            options.AddPolicy("RenderPolicy", policy =>
@@ -548,7 +548,7 @@
 //////                policy.WithOrigins("https://learnahead.onrender.com")
 //////                      .AllowAnyHeader()
 //////                      .AllowAnyMethod();
-//////                // àí úùúîù áÎcookies:
+//////                // ×× ×ª×©×ª××© ×‘Ö¾cookies:
 //////                // policy.AllowCredentials();
 //////            });
 //////        });
@@ -643,7 +643,7 @@
 
 //////        app.UseHttpsRedirection();
 
-//////        // ôúøåï ùâéàú Preflight CORS
+//////        // ×¤×ª×¨×•×Ÿ ×©×’×™××ª Preflight CORS
 //////        app.Use(async (context, next) =>
 //////        {
 //////            if (context.Request.Method == HttpMethods.Options)
@@ -656,7 +656,7 @@
 //////            await next();
 //////        });
 
-//////        // ñãø ÷øéèé: CORS ìôğé Auth å-Authz
+//////        // ×¡×“×¨ ×§×¨×™×˜×™: CORS ×œ×¤× ×™ Auth ×•-Authz
 //////        app.UseCors("RenderPolicy");
 
 //////        app.UseAuthentication();
@@ -904,7 +904,7 @@
 //                policy.WithOrigins("https://learnahead.onrender.com")
 //                      .AllowAnyHeader()
 //                      .AllowAnyMethod();
-//                //.AllowCredentials(); // ø÷ àí úùúîùé òí cookies/credentials
+//                //.AllowCredentials(); // ×¨×§ ×× ×ª×©×ª××©×™ ×¢× cookies/credentials
 //            });
 //        });
 
@@ -1009,6 +1009,108 @@
 //        app.Run();
 //    }
 //}
+//using FinalProject.Data;
+//using FinalProject.Service;
+//using Microsoft.EntityFrameworkCore;
+//using Microsoft.OpenApi.Models;
+//using System.Text.Json.Serialization;
+//using Microsoft.IdentityModel.Tokens;
+//using System.Text;
+//using DotNetEnv;
+//using FinalProject.Core.Services;
+//using FinalProject;
+//using FinalProject.Core.Repositories;
+//using FinalProject.Data.Repositories;
+
+//var builder = WebApplication.CreateBuilder(args);
+
+//// ------------------- Load environment variables -------------------
+//Env.Load(); // Ensure DotNetEnv is installed via NuGet
+
+//var dbConnectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+//var jwtIssuer = Environment.GetEnvironmentVariable("JWT__Issuer");
+//var jwtAudience = Environment.GetEnvironmentVariable("JWT__Audience");
+//var jwtKey = Environment.GetEnvironmentVariable("JWT__Key");
+
+//// ------------------- Configure DB -------------------
+//builder.Services.AddDbContext<DataContext>(options =>
+//    options.UseMySql(dbConnectionString, ServerVersion.AutoDetect(dbConnectionString)));
+
+//// ------------------- Configure CORS -------------------
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFrontend", policy =>
+//    {
+//        policy
+//            .WithOrigins("https://learnahead.onrender.com") // Your frontend URL
+//            .AllowAnyHeader()
+//            .AllowAnyMethod()
+//            .AllowCredentials();
+//    });
+//});
+
+//// ------------------- Configure Controllers -------------------
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+//// ------------------- Swagger -------------------
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FinalProject API", Version = "v1" });
+//});
+
+//// ------------------- Dependency Injection -------------------
+////builder.Services.AddScoped<IUserService, UserService>();
+////builder.Services.AddScoped<IFolderService, FolderService>();
+////builder.Services.AddScoped<IUploadService, UploadService>();
+//builder.Services.AddScoped<AuthService>();
+//builder.Services.AddScoped<AuthService>();
+//builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IFolderService, FolderService>();
+//builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+//// ------------------- Authentication & JWT -------------------
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.RequireHttpsMetadata = false;
+//        options.SaveToken = true;
+
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
+//            ValidIssuer = jwtIssuer,
+
+//            ValidateAudience = true,
+//            ValidAudience = jwtAudience,
+
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!)),
+
+//            ValidateLifetime = true,
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
+
+//// ------------------- Build & Run -------------------
+//var app = builder.Build();
+
+//app.UseCors("AllowFrontend");
+
+//app.UseAuthentication();
+//app.UseAuthorization();
+
+//app.MapControllers();
+
+
+//app.UseSwagger();
+//app.UseSwaggerUI();
+
+//app.MapGet("/", () => "API is running!");
+
+//app.Run();
 using FinalProject.Data;
 using FinalProject.Service;
 using Microsoft.EntityFrameworkCore;
@@ -1042,7 +1144,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("https://learnahead.onrender.com") // Your frontend URL
+            .WithOrigins("https://learnahead.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -1062,15 +1164,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ------------------- Dependency Injection -------------------
-//builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IFolderService, FolderService>();
-//builder.Services.AddScoped<IUploadService, UploadService>();
-builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFolderService, FolderService>();
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+
 // ------------------- Authentication & JWT -------------------
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
@@ -1082,32 +1181,30 @@ builder.Services.AddAuthentication("Bearer")
         {
             ValidateIssuer = true,
             ValidIssuer = jwtIssuer,
-
             ValidateAudience = true,
             ValidAudience = jwtAudience,
-
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!)),
-
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
     });
 
-// ------------------- Build & Run -------------------
+// ------------------- Build & Configure -------------------
 var app = builder.Build();
+
+// âœ… ×¡×“×¨ ×ª×§×™×Ÿ ×©×œ ×§×¨×™××•×ª middleware
+app.UseRouting(); // â† ×—×•×‘×” ×œ×¤× ×™ CORS/Auth
 
 app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
-
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.MapControllers();
 app.MapGet("/", () => "API is running!");
 
 app.Run();
