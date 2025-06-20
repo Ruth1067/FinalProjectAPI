@@ -47,9 +47,15 @@ public class UploadController : ControllerBase
         return $"{courseId}-{lessonId}"; // מחזיר רק את השם המנוקה
     }
 
+    //[HttpPost("upload-file")]
+    //public async Task<IActionResult> UploadFile(IFormFile file, int courseId, int lessonId)
+    //{
     [HttpPost("upload-file")]
-    public async Task<IActionResult> UploadFile(IFormFile file, int courseId, int lessonId)
-    {
+    public async Task<IActionResult> UploadFile(
+    [FromForm] IFormFile file,
+    [FromForm] int courseId,
+    [FromForm] int lessonId)
+    { 
         if (file == null || file.Length == 0)
         {
             return BadRequest("No file uploaded.");
@@ -201,69 +207,134 @@ public class UploadController : ControllerBase
     //}
 
     //[Authorize]
-    [HttpGet("transcript")]
-    [ProducesResponseType(typeof(string), 200)] // Swagger יציג את זה כמחרוזת
-    public async Task<IActionResult> GetTranscriptContentAsync([FromQuery] string fileName)
+
+
+
+    [HttpGet("download-lesson")]
+    [ProducesResponseType(typeof(object), 200)]
+    public async Task<IActionResult> DownloadLesson([FromQuery] string mediaFileName, [FromQuery] string transcriptFileName)
     {
         try
         {
-            // בדיקה אם הקובץ קיים
-            var metadataRequest = new GetObjectMetadataRequest
+            // -----------------------------
+            // 1. יצירת Signed URL לצפייה בקובץ המדיה (אם Public לא נדרש)
+            // -----------------------------
+            var mediaUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{mediaFileName}";
+
+            // -----------------------------
+            // 2. הורדת תוכן התמלול מהקובץ JSON
+            // -----------------------------
+            var transcriptRequest = new GetObjectRequest
             {
                 BucketName = _bucketName,
-                Key = fileName
+                Key = transcriptFileName
             };
+
+            string transcriptText = "";
 
             try
             {
-                await _s3Client.GetObjectMetadataAsync(metadataRequest);
-            }
-            catch (AmazonS3Exception e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return NotFound("Transcript file not found.");
-            }
+                using var response = await _s3Client.GetObjectAsync(transcriptRequest);
+                using var reader = new StreamReader(response.ResponseStream);
+                var content = await reader.ReadToEndAsync();
 
-            // הורדת הקובץ
-            var getRequest = new GetObjectRequest
-            {
-                BucketName = _bucketName,
-                Key = fileName
-            };
-
-            using var response = await _s3Client.GetObjectAsync(getRequest);
-            using var reader = new StreamReader(response.ResponseStream);
-            var content = await reader.ReadToEndAsync();
-
-            // חילוץ טקסט מתוך transcripts
-            try
-            {
                 var jsonNode = JsonNode.Parse(content);
                 var transcriptsArray = jsonNode?["results"]?["transcripts"]?.AsArray();
 
-                if (transcriptsArray == null || transcriptsArray.Count == 0)
-                    return NotFound("No transcripts found in the file.");
-
-                var combinedText = string.Join(" ", transcriptsArray
-                    .Select(t => t?["transcript"]?.ToString())
-                    .Where(t => !string.IsNullOrWhiteSpace(t)));
-
-                if (string.IsNullOrWhiteSpace(combinedText))
-                    return NotFound("Transcript text is empty.");
-
-                return Ok(combinedText); // מחזיר רק את הטקסט במחרוזת אחת
+                if (transcriptsArray != null && transcriptsArray.Count > 0)
+                {
+                    transcriptText = string.Join(" ", transcriptsArray
+                        .Select(t => t?["transcript"]?.ToString())
+                        .Where(t => !string.IsNullOrWhiteSpace(t)));
+                }
             }
-            catch (JsonException)
+            catch (AmazonS3Exception e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return BadRequest("The file content is not a valid JSON.");
+                transcriptText = "Transcription not available.";
             }
-        }
-        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
-        {
-            return StatusCode(403, "Access Denied: Check permissions.");
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error reading transcript: {ex.Message}");
+            }
+
+            // -----------------------------
+            // 3. החזרת תגובה מאוחדת
+            // -----------------------------
+            return Ok(new
+            {
+                mediaUrl,
+                transcriptText
+            });
         }
         catch (Exception ex)
         {
             return StatusCode(500, $"Unexpected error: {ex.Message}");
         }
     }
+
+    //[HttpGet("transcript")]
+    //[ProducesResponseType(typeof(string), 200)] // Swagger יציג את זה כמחרוזת
+    //public async Task<IActionResult> GetTranscriptContentAsync([FromQuery] string fileName)
+    //{
+    //    try
+    //    {
+    //        // בדיקה אם הקובץ קיים
+    //        var metadataRequest = new GetObjectMetadataRequest
+    //        {
+    //            BucketName = _bucketName,
+    //            Key = fileName
+    //        };
+
+    //        try
+    //        {
+    //            await _s3Client.GetObjectMetadataAsync(metadataRequest);
+    //        }
+    //        catch (AmazonS3Exception e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+    //        {
+    //            return NotFound("Transcript file not found.");
+    //        }
+
+    //        // הורדת הקובץ
+    //        var getRequest = new GetObjectRequest
+    //        {
+    //            BucketName = _bucketName,
+    //            Key = fileName
+    //        };
+
+    //        using var response = await _s3Client.GetObjectAsync(getRequest);
+    //        using var reader = new StreamReader(response.ResponseStream);
+    //        var content = await reader.ReadToEndAsync();
+
+    //        // חילוץ טקסט מתוך transcripts
+    //        try
+    //        {
+    //            var jsonNode = JsonNode.Parse(content);
+    //            var transcriptsArray = jsonNode?["results"]?["transcripts"]?.AsArray();
+
+    //            if (transcriptsArray == null || transcriptsArray.Count == 0)
+    //                return NotFound("No transcripts found in the file.");
+
+    //            var combinedText = string.Join(" ", transcriptsArray
+    //                .Select(t => t?["transcript"]?.ToString())
+    //                .Where(t => !string.IsNullOrWhiteSpace(t)));
+
+    //            if (string.IsNullOrWhiteSpace(combinedText))
+    //                return NotFound("Transcript text is empty.");
+
+    //            return Ok(combinedText); // מחזיר רק את הטקסט במחרוזת אחת
+    //        }
+    //        catch (JsonException)
+    //        {
+    //            return BadRequest("The file content is not a valid JSON.");
+    //        }
+    //    }
+    //    catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+    //    {
+    //        return StatusCode(403, "Access Denied: Check permissions.");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return StatusCode(500, $"Unexpected error: {ex.Message}");
+    //    }
+    //}
 }
