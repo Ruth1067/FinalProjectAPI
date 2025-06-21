@@ -9,9 +9,8 @@
 //using System.Net;
 //using System.Net.Mail;
 //using System.Threading.Tasks;
-//using Microsoft.AspNetCore.Authorization;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//[ApiController]
+//using Microsoft.AspNetCore.Authorization;//מה שנמצא ברנדר
+//===================================================================================================//[ApiController]
 //[Route("api/[controller]")]
 //public class AuthController : ControllerBase
 //{
