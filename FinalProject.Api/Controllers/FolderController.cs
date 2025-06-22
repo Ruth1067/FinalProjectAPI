@@ -435,6 +435,71 @@ namespace FinalProject.Controllers
             }
         }
 
+        //[Authorize(Roles = "Teacher")]
+        [HttpDelete("delete-course/{folderId}")]
+        public async Task<IActionResult> DeleteCourse(int folderId)
+        {
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+
+            if (folder == null || folder.CourseId == null || folder.LessonId != null)
+                return NotFound("Course not found.");
+
+            _dataContext.Folders.Remove(folder);
+            await _dataContext.SaveChangesAsync();
+
+            return Ok("Course deleted successfully.");
+        }
+
+        //[Authorize(Roles = "Teacher")]
+        [HttpPut("update-course/{folderId}")]
+        public async Task<IActionResult> UpdateCourse(int folderId, [FromBody] FolderModel updated)
+        {
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+
+            if (folder == null || folder.CourseId == null || folder.LessonId != null)
+                return NotFound("Course not found.");
+
+            // רק שדות מותרים לעדכון:
+            folder.Title = updated.Title ?? folder.Title;
+            folder.description = updated.description ?? folder.description;
+            folder.price = updated.price != 0 ? updated.price : folder.price;
+            folder.numberOfLessons = updated.numberOfLessons != 0 ? updated.numberOfLessons : folder.numberOfLessons;
+
+            await _dataContext.SaveChangesAsync();
+            return Ok("Course updated successfully.");
+        }
+
+        //[Authorize(Roles = "Teacher")]
+        [HttpDelete("delete-lesson/{folderId}")]
+        public async Task<IActionResult> DeleteLesson(int folderId)
+        {
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+
+            if (folder == null || folder.LessonId == null)
+                return NotFound("Lesson not found.");
+
+            _dataContext.Folders.Remove(folder);
+            await _dataContext.SaveChangesAsync();
+
+            return Ok("Lesson deleted successfully.");
+        }
+
+        //[Authorize(Roles = "Teacher")]
+        [HttpPut("update-lesson/{folderId}")]
+        public async Task<IActionResult> UpdateLesson(int folderId, [FromBody] LessonModel updated)
+        {
+            var folder = await _dataContext.Folders.FindAsync(folderId);
+
+            if (folder == null || folder.LessonId == null)
+                return NotFound("Lesson not found.");
+
+            folder.Title = updated.Title ?? folder.Title;
+            folder.description = updated.description ?? folder.description;
+
+            await _dataContext.SaveChangesAsync();
+            return Ok("Lesson updated successfully.");
+        }
+
 
     }
 }

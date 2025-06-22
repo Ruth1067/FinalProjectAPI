@@ -71,7 +71,8 @@ public class UploadController : ControllerBase
                 BucketName = _bucketName,
                 Key = newFileName, // השתמש בשם החדש כאן
                 InputStream = file.OpenReadStream(),
-                ContentType = file.ContentType
+                //ContentType = file.ContentType
+                ContentType = "audio/wav"
             };
 
             await _s3Client.PutObjectAsync(request);
