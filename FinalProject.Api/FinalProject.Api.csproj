@@ -34,6 +34,9 @@
 	  <UserSecretsId>1257dbbc-2b1f-48cc-a84a-a6dd0ea1cfaa</UserSecretsId>
 	  <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Controllers\UploadController.cs~RF568952.TMP" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
