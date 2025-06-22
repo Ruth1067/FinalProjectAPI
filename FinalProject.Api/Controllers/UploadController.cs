@@ -211,29 +211,18 @@ public class UploadController : ControllerBase
 
 
 
-
-
     [HttpGet("download-lesson")]
     [ProducesResponseType(typeof(object), 200)]
     public async Task<IActionResult> DownloadLesson([FromQuery] int courseId, [FromQuery] int lessonId)
     {
         try
         {
-            var mediaFileName = $"{courseId}-{lessonId}-A.wav";
-            var transcriptFileName = $"{courseId}-{lessonId}.json";
+            // יצירת שם הקובץ על פי הפורמט שהשתמשת בו בהעלאה
+            var mediaFileName = $"{courseId}-{lessonId}-A.wav"; // הנחה: הקבצים בפורמט 'aws'
+            var transcriptFileName = $"{courseId}-{lessonId}.json"; // פלט Transcribe לפי JobName
 
-            // ========== יצירת Signed URL לקובץ האודיו ==========
-            var preSignedUrlRequest = new GetPreSignedUrlRequest
-            {
-                BucketName = _bucketName,
-                Key = mediaFileName,
-                Expires = DateTime.UtcNow.AddMinutes(15),
-                Verb = HttpVerb.GET
-            };
+            var mediaUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{mediaFileName}";
 
-            var mediaUrl = _s3Client.GetPreSignedURL(preSignedUrlRequest);
-
-            // ========== ניסיון לקרוא את קובץ התמלול ==========
             var transcriptRequest = new GetObjectRequest
             {
                 BucketName = _bucketName,
@@ -278,70 +267,6 @@ public class UploadController : ControllerBase
             return StatusCode(500, $"Unexpected error: {ex.Message}");
         }
     }
-
-
-
-    //[HttpGet("download-lesson")]
-    //[ProducesResponseType(typeof(object), 200)]
-    //public async Task<IActionResult> DownloadLesson([FromQuery] int courseId, [FromQuery] int lessonId)
-    //{
-    //    try
-    //    {
-    //        // יצירת שם הקובץ על פי הפורמט שהשתמשת בו בהעלאה
-    //        var mediaFileName = $"{courseId}-{lessonId}-A.wav"; // הנחה: הקבצים בפורמט 'aws'
-    //        var transcriptFileName = $"{courseId}-{lessonId}.json"; // פלט Transcribe לפי JobName
-
-    //        var mediaUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{mediaFileName}";
-
-    //        var transcriptRequest = new GetObjectRequest
-    //        {
-    //            BucketName = _bucketName,
-    //            Key = transcriptFileName
-    //        };
-
-    //        string transcriptText = "";
-
-    //        try
-    //        {
-    //            using var response = await _s3Client.GetObjectAsync(transcriptRequest);
-    //            using var reader = new StreamReader(response.ResponseStream);
-    //            var content = await reader.ReadToEndAsync();
-
-    //            var jsonNode = JsonNode.Parse(content);
-    //            var transcriptsArray = jsonNode?["results"]?["transcripts"]?.AsArray();
-
-    //            if (transcriptsArray != null && transcriptsArray.Count > 0)
-    //            {
-    //                transcriptText = string.Join(" ", transcriptsArray
-    //                    .Select(t => t?["transcript"]?.ToString())
-    //                    .Where(t => !string.IsNullOrWhiteSpace(t)));
-    //            }
-    //        }
-    //        catch (AmazonS3Exception e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
-    //        {
-    //            transcriptText = "Transcription not available.";
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            return StatusCode(500, $"Error reading transcript: {ex.Message}");
-    //        }
-
-    //        return Ok(new
-    //        {
-    //            mediaUrl,
-    //            transcriptText
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return StatusCode(500, $"Unexpected error: {ex.Message}");
-    //    }
-    //}
-
-
-
-
-
 
     //[HttpGet("download-lesson")]
     //[ProducesResponseType(typeof(object), 200)]
