@@ -217,7 +217,7 @@ public class UploadController : ControllerBase
         try
         {
             // יצירת שם הקובץ על פי הפורמט שהשתמשת בו בהעלאה
-            var mediaFileName = $"{courseId}-{lessonId}-A.mp3"; // הנחה: הקבצים בפורמט mp3
+            var mediaFileName = $"{courseId}-{lessonId}-A.wav"; // הנחה: הקבצים בפורמט mp3
             var transcriptFileName = $"{courseId}-{lessonId}.json"; // פלט Transcribe לפי JobName
 
             var mediaUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{mediaFileName}";
